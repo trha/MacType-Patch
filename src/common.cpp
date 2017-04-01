@@ -166,18 +166,22 @@ extern void unhookAll() {
 	{
 		auto lock = globalMutex.getLock();
 		_LhUninstallAllHooks();
-		fpIndex = 0;
-		fpSet.clear();
-		vtblSet.clear();
-		for (auto e : mhookSet) {
-			Mhook_Unhook(e);
-		}
-		mhookSet.clear();
+    if (isInited) {
+      fpIndex = 0;
+      fpSet.clear();
+      vtblSet.clear();
+      for (auto e : mhookSet) {
+        Mhook_Unhook(e);
+      }
+      mhookSet.clear();
+    }
 	}
 	_LhWaitForPendingRemovals();
 	{
 		auto lock = globalMutex.getLock();
-		changeMap.clear();
+    if (isInited) {
+      changeMap.clear();
+    }
 		isInited = false;
 	}
 }

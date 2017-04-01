@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -27,26 +27,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -147,13 +147,14 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PreprocessorDefinitions>EASYHOOK_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>EasyHook\Aux_ulib_x86.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)\Mhook</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
@@ -177,13 +178,14 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PreprocessorDefinitions>EASYHOOK_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>EasyHook\Aux_ulib_x64.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)\Mhook</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
@@ -212,7 +214,8 @@
     <ClCompile Include="EasyHook\Disassembler\libudis86\syn-intel.c" />
     <ClCompile Include="EasyHook\Disassembler\libudis86\syn.c" />
     <ClCompile Include="EasyHook\Disassembler\libudis86\udis86.c" />
-    <ClCompile Include="EasyHook\EasyHook_dllmain.c" />
+    <ClCompile Include="EasyHook\easyhook_dllmain.c" />
+    <ClCompile Include="EasyHook\gacutil.cpp" />
     <ClCompile Include="EasyHook\LocalHook\acl.c" />
     <ClCompile Include="EasyHook\LocalHook\alloc.c" />
     <ClCompile Include="EasyHook\LocalHook\barrier.c" />
@@ -221,7 +224,13 @@
     <ClCompile Include="EasyHook\LocalHook\install.c" />
     <ClCompile Include="EasyHook\LocalHook\reloc.c" />
     <ClCompile Include="EasyHook\LocalHook\uninstall.c" />
+    <ClCompile Include="EasyHook\RemoteHook\driver.cpp" />
+    <ClCompile Include="EasyHook\RemoteHook\entry.cpp" />
+    <ClCompile Include="EasyHook\RemoteHook\service.c" />
+    <ClCompile Include="EasyHook\RemoteHook\stealth.c" />
+    <ClCompile Include="EasyHook\RemoteHook\thread.c" />
     <ClCompile Include="EasyHook\Rtl\error.c" />
+    <ClCompile Include="EasyHook\Rtl\file.c" />
     <ClCompile Include="EasyHook\Rtl\memory.c" />
     <ClCompile Include="EasyHook\Rtl\string.c" />
     <ClCompile Include="src\common.cpp" />
@@ -243,13 +252,30 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EasyHook\AUX_ULIB.H" />
+    <ClInclude Include="EasyHook\Disassembler\libudis86\decode.h" />
+    <ClInclude Include="EasyHook\Disassembler\libudis86\extern.h" />
+    <ClInclude Include="EasyHook\Disassembler\libudis86\itab.h" />
+    <ClInclude Include="EasyHook\Disassembler\libudis86\syn.h" />
+    <ClInclude Include="EasyHook\Disassembler\libudis86\types.h" />
+    <ClInclude Include="EasyHook\Disassembler\libudis86\udint.h" />
+    <ClInclude Include="EasyHook\Disassembler\udis86.h" />
+    <ClInclude Include="EasyHook\DriverShared.h" />
     <ClInclude Include="EasyHook\easyhook.h" />
+    <ClInclude Include="EasyHook\ntstatus.h" />
+    <ClInclude Include="EasyHook\resource.h" />
+    <ClInclude Include="EasyHook\rtl.h" />
+    <ClInclude Include="EasyHook\stdafx.h" />
     <ClInclude Include="Mhook\mhook.h" />
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\easyhook2.h" />
     <ClInclude Include="src\lock\RecursiveLock.h" />
     <ClInclude Include="src\lock\RecursiveMutex.h" />
     <ClInclude Include="src\userparams.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="EasyHook\AUX_ULIB_x64.LIB" />
+    <Library Include="EasyHook\AUX_ULIB_x86.LIB" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

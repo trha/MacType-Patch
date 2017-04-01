@@ -93,9 +93,6 @@
     <ClCompile Include="src\EasyHK.cpp">
       <Filter>ソース ファイル\src</Filter>
     </ClCompile>
-    <ClCompile Include="EasyHook\EasyHook_dllmain.c">
-      <Filter>ソース ファイル\EasyHook</Filter>
-    </ClCompile>
     <ClCompile Include="src\direct2d.cpp">
       <Filter>ソース ファイル\src</Filter>
     </ClCompile>
@@ -110,6 +107,30 @@
     </ClCompile>
     <ClCompile Include="src\userparams.cpp">
       <Filter>ソース ファイル\src</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\easyhook_dllmain.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\gacutil.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\Rtl\file.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\RemoteHook\driver.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\RemoteHook\entry.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\RemoteHook\service.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\RemoteHook\stealth.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\RemoteHook\thread.c">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,5 +171,48 @@
     <ClInclude Include="EasyHook\easyhook.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="EasyHook\AUX_ULIB.H">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\DriverShared.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\ntstatus.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\rtl.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\libudis86\decode.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\libudis86\extern.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\libudis86\itab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\libudis86\syn.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\libudis86\types.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\libudis86\udint.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="EasyHook\Disassembler\udis86.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="EasyHook\AUX_ULIB_x64.LIB" />
+    <Library Include="EasyHook\AUX_ULIB_x86.LIB" />
   </ItemGroup>
 </Project>
