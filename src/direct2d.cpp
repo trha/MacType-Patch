@@ -1,10 +1,10 @@
 #include <Sdkddkver.h>
 #undef NTDDI_VERSION
-#define NTDDI_VERSION NTDDI_WIN10_RS1
+#define NTDDI_VERSION NTDDI_WIN10_RS2
 #include <d2d1_3.h>
 #include "common.h"
 #include "userparams.h"
-
+#include <atlcomcli.h>
 
 
 static void hookID2D1RenderTargetIfStill(ID2D1RenderTarget* pD2D1RenderTarget);
@@ -99,6 +99,24 @@ namespace Impl_ID2D1Device4
 		);
 		if (SUCCEEDED(hr)) {
 			hookID2D1DeviceContextIfStill(*deviceContext4);
+		}
+		return hr;
+	}
+}
+
+namespace Impl_ID2D1Device5
+{
+	static HRESULT WINAPI CreateDeviceContext(
+		ID2D1Device5* This,
+		D2D1_DEVICE_CONTEXT_OPTIONS options,
+		ID2D1DeviceContext5** deviceContext5
+	) {
+		HRESULT hr = This->CreateDeviceContext(
+			options,
+			deviceContext5
+		);
+		if (SUCCEEDED(hr)) {
+			hookID2D1DeviceContextIfStill(*deviceContext5);
 		}
 		return hr;
 	}
@@ -300,6 +318,64 @@ namespace Impl_ID2D1Factory5
 	}
 }
 
+namespace Impl_ID2D1Factory6
+{
+	static HRESULT WINAPI CreateDevice(
+		ID2D1Factory6* This,
+		IDXGIDevice* dxgiDevice,
+		ID2D1Device5** d2dDevice5
+	) {
+		HRESULT hr = This->CreateDevice(
+			dxgiDevice,
+			d2dDevice5
+		);
+		if (SUCCEEDED(hr)) {
+			hookID2D1DeviceIfStill(*d2dDevice5);
+		}
+		return hr;
+	}
+}
+void bolden(ID2D1RenderTarget* target, DWRITE_GLYPH_RUN const* glyphRun, D2D1_POINT_2F baselineOrigin, ID2D1Brush* outline) {
+    if (GeneralParams.boldenLevel < 0.05f) {
+      return;
+    }
+
+    CComPtr<ID2D1Factory> factory;
+    target->GetFactory(&factory);
+
+    CComPtr<ID2D1PathGeometry> path;
+    factory->CreatePathGeometry(&path);
+
+    CComPtr<ID2D1GeometrySink> sink;
+    path->Open(&sink);
+    glyphRun->fontFace->GetGlyphRunOutline(
+      glyphRun->fontEmSize,
+      glyphRun->glyphIndices,
+      glyphRun->glyphAdvances,
+      glyphRun->glyphOffsets,
+      glyphRun->glyphCount,
+      glyphRun->isSideways,
+      glyphRun->bidiLevel % 2,
+      sink
+    );
+    sink->Close();
+    auto const matrix = D2D1::Matrix3x2F(
+      1.0f, 0.0f,
+      0.0f, 1.0f,
+      baselineOrigin.x, baselineOrigin.y
+    );
+
+    // Create the transformed geometry
+    CComPtr<ID2D1TransformedGeometry> transformedPath;
+    factory->CreateTransformedGeometry(
+        path,
+        &matrix,
+        &transformedPath
+     );
+
+    target->DrawGeometry(transformedPath, outline, GeneralParams.boldenLevel);
+}
+
 namespace Impl_ID2D1RenderTarget
 {
 	static HRESULT WINAPI CreateCompatibleRenderTarget(
@@ -401,6 +477,7 @@ namespace Impl_ID2D1RenderTarget
 		ID2D1Brush *foregroundBrush,
 		DWRITE_MEASURING_MODE measuringMode
 	) {
+    bolden(This, glyphRun, baselineOrigin, foregroundBrush);
 		if (GeneralParams.ForceNoHinting) {
 			D2D1_MATRIX_3X2_F prev;
 			This->GetTransform(&prev);
@@ -467,6 +544,11 @@ static void hookID2D1Device4(ID2D1Device4* pD2D1Device4) {
 	hook(v[16], Impl_ID2D1Device4::CreateDeviceContext);
 }
 
+static void hookID2D1Device5(ID2D1Device5* pD2D1Device5) {
+	void** v = getVtbl(pD2D1Device5);
+	hook(v[17], Impl_ID2D1Device5::CreateDeviceContext);
+}
+
 static void hookID2D1Factory(ID2D1Factory* pD2D1Factory) {
 	void** v = getVtbl(pD2D1Factory);
 	hook(v[13], Impl_ID2D1Factory::CreateWicBitmapRenderTarget);
@@ -500,6 +582,11 @@ static void hookID2D1Factory5(ID2D1Factory5* pD2D1Factory5) {
 	hook(v[30], Impl_ID2D1Factory5::CreateDevice);
 }
 
+static void hookID2D1Factory6(ID2D1Factory6* pD2D1Factory6) {
+	void** v = getVtbl(pD2D1Factory6);
+	hook(v[31], Impl_ID2D1Factory6::CreateDevice);
+}
+
 static void hookID2D1RenderTarget(ID2D1RenderTarget* pD2D1RenderTarget) {
 	void** v = getVtbl(pD2D1RenderTarget);
 	hook(v[12], Impl_ID2D1RenderTarget::CreateCompatibleRenderTarget);
@@ -526,6 +613,7 @@ static void hookID2D1DeviceIfStill(ID2D1Device* pD2D1Device) {
 		hookIfImplemented(pD2D1Device, hookID2D1Device2);
 		hookIfImplemented(pD2D1Device, hookID2D1Device3);
 		hookIfImplemented(pD2D1Device, hookID2D1Device4);
+		hookIfImplemented(pD2D1Device, hookID2D1Device5);
 	}
 }
 
@@ -589,6 +677,7 @@ static void hookID2D1FactoryIfStill(ID2D1Factory* pD2D1Factory) {
 		hookIfImplemented(pD2D1Factory, hookID2D1Factory3);
 		hookIfImplemented(pD2D1Factory, hookID2D1Factory4);
 		hookIfImplemented(pD2D1Factory, hookID2D1Factory5);
+		hookIfImplemented(pD2D1Factory, hookID2D1Factory6);
 	}
 }
 

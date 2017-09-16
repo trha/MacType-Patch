@@ -44,11 +44,24 @@ static void loadGeneralParams(LPCWSTR path) {
 		L"ForceNoHinting",
 		(int)GeneralParams.ForceNoHinting,
 		path);
+
+  GeneralParams.boldenLevel = GetPrivateProfileIntW(
+    L"General",
+    L"BoldenLevel",
+    static_cast<int>(GeneralParams.boldenLevel * 100),
+    path
+  ) / 100.f;
 	
 	wchar_t exePath[_MAX_PATH];
 	GetModuleFileNameW(NULL, exePath, _MAX_PATH);
 	wchar_t* exeName = PathFindFileNameW(exePath);
 	CharLower(exeName);
+
+  {
+    std::set<std::wstring, std::less<>> set;
+    loadExeName(set, L"UseWf", path);
+    GeneralParams.useWf = set.find(exeName) != set.end();
+  }
 	
 	switch (GeneralParams.HookTarget) {
 		case HookTargetEnum::All:

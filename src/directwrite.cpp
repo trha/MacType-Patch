@@ -1,9 +1,12 @@
 #include <dwrite_3.h>
+#include <d2d1_3.h>
 #include "common.h"
 #include "userparams.h"
 
 
 #include <windows.h>
+#include <unordered_map>
+#include <atlcomcli.h>
 
 
 static void hookIDWriteBitmapRenderTargetIfStill(IDWriteBitmapRenderTarget* pDWriteBitmapRenderTarget);
@@ -12,10 +15,36 @@ static void hookIDWriteFactoryIfStill(IDWriteFactory* pDWriteFactory);
 static void hookIDWriteGlyphRunAnalysisIfStill(IDWriteGlyphRunAnalysis* pDWriteGlyphRunAnalysis);
 static void hookIDWriteFontCollectionIfStill(IDWriteFontCollection* pDWriteFontCollection);
 
+//ID2D1Factory* d2d1_factory{};
+//std::unordered_map<IDWriteBitmapRenderTarget*, ID2D1DCRenderTarget*> dw_to_d2{};
 
 
 namespace Impl_IDWriteBitmapRenderTarget
 {
+  static ULONG WINAPI AddRef(IUnknown* This) {
+//    CComPtr<IDWriteBitmapRenderTarget> target;
+//    auto hr = This->QueryInterface(&target);
+//    if (SUCCEEDED(hr)) {
+//      auto it = dw_to_d2.find(target);
+//      if (it != dw_to_d2.end()) {
+//        it->second->AddRef();
+//      }
+//    }
+    return This->AddRef();
+  }
+
+  static ULONG WINAPI Release(IUnknown* This) {
+    auto after = This->Release();
+    if (!after) {
+//      CComPtr<IDWriteBitmapRenderTarget> target;
+//      auto hr = This->QueryInterface(&target);
+//      if (SUCCEEDED(hr)) {
+//        dw_to_d2.erase(target);
+//      }
+    }
+    return after;
+  }
+
 	static HRESULT WINAPI DrawGlyphRun(
 		IDWriteBitmapRenderTarget* This,
 		FLOAT baselineOriginX,
@@ -26,6 +55,25 @@ namespace Impl_IDWriteBitmapRenderTarget
 		COLORREF textColor,
 		RECT* blackBoxRect
 	) {
+//    auto it = dw_to_d2.find(This);
+//    if (it != dw_to_d2.end()) {
+//      auto hr = S_OK;
+//      auto& d2_target = it->second;
+//      CComPtr<ID2D1SolidColorBrush> brush;
+//      hr = d2_target->CreateSolidColorBrush(D2D1::ColorF(
+//        GetRValue(textColor) / 255.f, GetGValue(textColor) / 255.f, GetBValue(textColor) / 255.f 
+//      ), &brush);
+//      if (SUCCEEDED(hr)) {
+//        d2_target->DrawGlyphRun(
+//          D2D1::Point2F(baselineOriginX, baselineOriginY),
+//          glyphRun,
+//          brush,
+//          measuringMode
+//        );
+//        return S_OK;
+//      }
+//    }
+
 		HRESULT hr = E_FAIL;
 		if (GeneralParams.ForceNoHinting) {
 			DWRITE_MATRIX prev;
@@ -77,6 +125,23 @@ namespace Impl_IDWriteBitmapRenderTarget
 
 namespace Impl_IDWriteFactory
 {
+  static ULONG WINAPI AddRef(IUnknown* This) {
+    auto r = This->AddRef();
+    return r;
+  }
+
+  static ULONG WINAPI Release(IUnknown* This) {
+    auto after = This->Release();
+//    if (d2d1_factory && after == 0) {
+//      d2d1_factory->Release();
+//      if (after == 0) {
+//        d2d1_factory = nullptr;
+//      }
+//    }
+
+    return after;
+  }
+
 	static HRESULT WINAPI GetSystemFontCollection(
 		IDWriteFactory* This,
 		IDWriteFontCollection** fontCollection,
@@ -339,9 +404,30 @@ namespace Impl_IDWriteGdiInterop
 			height,
 			renderTarget
 		);
-		if (SUCCEEDED(hr)) {
-			hookIDWriteBitmapRenderTargetIfStill(*renderTarget);
-		}
+//		if (SUCCEEDED(hr)) {
+//      if (d2d1_factory) {
+//        D2D1_RENDER_TARGET_PROPERTIES props{};
+//        props.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
+//        props.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
+//        props.dpiX = (*renderTarget)->GetPixelsPerDip();
+//        props.dpiY = (*renderTarget)->GetPixelsPerDip();
+//        props.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
+//        props.minLevel = D2D1_FEATURE_LEVEL_DEFAULT;
+//
+//        ID2D1DCRenderTarget* d2_target;
+//        hr = d2d1_factory->CreateDCRenderTarget(&props, &d2_target);
+//        if (SUCCEEDED(hr)) {
+//          RECT rc{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
+//          hr = d2_target->BindDC(hdc, &rc);
+//          if (hr) {
+//            dw_to_d2.emplace(*renderTarget, d2_target);
+//          } else {
+//            d2_target->Release();
+//          }
+//        }
+//      }
+//			hookIDWriteBitmapRenderTargetIfStill(*renderTarget);
+//		}
 		return hr;
 	}
 }
@@ -407,11 +493,23 @@ static void hookIDWriteBitmapRenderTarget(IDWriteBitmapRenderTarget* pDWriteBitm
 	hook(v[3], Impl_IDWriteBitmapRenderTarget::DrawGlyphRun);
 }
 
+static void hookIDWriteBitmapRenderTargetUnknown(IUnknown* unk) {
+	void** v = getVtbl(unk);
+  hook(v[1], Impl_IDWriteBitmapRenderTarget::AddRef);
+  hook(v[2], Impl_IDWriteBitmapRenderTarget::Release);
+}
+
 static void hookIDWriteFactory(IDWriteFactory* pDWriteFactory) {
 	void** v = getVtbl(pDWriteFactory);
 	hook(v[3], Impl_IDWriteFactory::GetSystemFontCollection);
 	hook(v[17], Impl_IDWriteFactory::GetGdiInterop);
 	hook(v[23], Impl_IDWriteFactory::CreateGlyphRunAnalysis);
+}
+
+static void hookIDWriteFactoryUnknown(IUnknown* unk) {
+	void** v = getVtbl(unk);
+  hook(v[1], Impl_IDWriteFactory::AddRef);
+  hook(v[2], Impl_IDWriteFactory::Release);
 }
 
 static void hookIDWriteFactory2(IDWriteFactory2* pDWriteFactory2) {
@@ -446,6 +544,7 @@ static void hookIDWriteBitmapRenderTargetIfStill(IDWriteBitmapRenderTarget* pDWr
 	auto lock = globalMutex.getLock();
 	if (insertVtbl(vtbl)) {
 		hookIDWriteBitmapRenderTarget(pDWriteBitmapRenderTarget);
+//    hookIfImplemented(pDWriteBitmapRenderTarget, hookIDWriteBitmapRenderTargetUnknown);
 	}
 }
 
@@ -454,6 +553,7 @@ static void hookIDWriteFactoryIfStill(IDWriteFactory* pDWriteFactory) {
 	auto lock = globalMutex.getLock();
 	if (insertVtbl(vtbl)) {
 		hookIDWriteFactory(pDWriteFactory);
+//    hookIfImplemented(pDWriteFactory, hookIDWriteFactoryUnknown);
 		hookIfImplemented(pDWriteFactory, hookIDWriteFactory2);
 		hookIfImplemented(pDWriteFactory, hookIDWriteFactory3);
 	}
@@ -494,6 +594,10 @@ namespace Impl
 	) {
 		HRESULT hr = ::DWriteCreateFactory(factoryType, iid, factory);
 		if (SUCCEEDED(hr)) {
+//      if (!d2d1_factory) {
+//        D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &d2d1_factory);
+//      }
+
 			IDWriteFactory* pDWriteFactory;
 			HRESULT hr2 = (*factory)->QueryInterface(&pDWriteFactory);
 			if (SUCCEEDED(hr2)) {

@@ -10,11 +10,13 @@
 #pragma comment(lib, "Shlwapi.lib")
 
 #ifndef _WIN64
-	#pragma comment(lib, "mhook32.lib")
+	//#pragma comment(lib, "mhook32.lib")
 	LPCWSTR MacTypeDllName = L"MacType.dll";
+  auto const WfPath = LR"("C:\Program Files\WinFont+\WinFont+.exe")";
 #else
-	#pragma comment(lib, "mhook64.lib")
+	//#pragma comment(lib, "mhook64.lib")
 	LPCWSTR MacTypeDllName = L"MacType64.dll";
+  auto const WfPath = LR"("C:\Program Files\WinFont+\WinFont+64.exe")";
 #endif
 
 
@@ -24,9 +26,20 @@ extern void init() {
 	if (hModule) {
 		loadUserParams(hModule);
 		if (GeneralParams.isHookTarget) {
-			initMacTypeIntercept();
-			hookDirectWrite();
-			hookDirect2D();
+      if (GeneralParams.useWf) {
+        wchar_t buff[4096]{};
+        wsprintf(buff, L"%s -Hook %d", WfPath, GetCurrentProcessId());
+        STARTUPINFOW info = { sizeof(info) };
+        PROCESS_INFORMATION procInfo;
+        if (CreateProcessW(nullptr, buff, nullptr, nullptr, FALSE, CREATE_NO_WINDOW, nullptr, nullptr, &info, &procInfo)) {
+          CloseHandle(procInfo.hProcess);
+          CloseHandle(procInfo.hThread);
+        }
+      } else {
+        initMacTypeIntercept();
+        hookDirect2D();
+        hookDirectWrite();
+      }
 		}
 	}
 }

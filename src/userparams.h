@@ -15,6 +15,8 @@ struct _GeneralParams {
 	HookTargetEnum HookTarget = HookTargetEnum::None;
 	bool isHookTarget = false;
 	bool ForceNoHinting = false;
+  float boldenLevel = 0.2f;
+  bool useWf = false;
 };
 
 extern void initDWriteRenderingParams();

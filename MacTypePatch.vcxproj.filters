@@ -111,9 +111,6 @@
     <ClCompile Include="EasyHook\easyhook_dllmain.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="EasyHook\gacutil.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="EasyHook\Rtl\file.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -130,6 +127,24 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="EasyHook\RemoteHook\thread.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="EasyHook\gacutil.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="diasm\cpu.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="diasm\disasm.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="diasm\disasm_x86.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="diasm\misc.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Mhook\mhook.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,9 +179,6 @@
     </ClInclude>
     <ClInclude Include="src\lock\RecursiveMutex.h">
       <Filter>ヘッダー ファイル\lock</Filter>
-    </ClInclude>
-    <ClInclude Include="Mhook\mhook.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="EasyHook\easyhook.h">
       <Filter>ヘッダー ファイル</Filter>
@@ -208,6 +220,24 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="EasyHook\Disassembler\udis86.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Mhook\mhook.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="diasm\cpu.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="diasm\disasm.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="diasm\disasm_x86.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="diasm\disasm_x86_tables.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="diasm\misc.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
